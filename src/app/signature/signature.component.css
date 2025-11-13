@@ -1,7 +1,7 @@
 /* Page Layout */
 .page-container {
   display: flex;
-  gap: 40px;
+  gap: 60px;
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
@@ -76,8 +76,8 @@
 
 .copy-button {
   padding: 12px 24px;
-  background-color: #101828;
-  color: white;
+  background-color: var(--inverita-blue);
+  color: var(--inverita-white);
   border: none;
   border-radius: 6px;
   font-family: "Montserrat", sans-serif;
@@ -88,11 +88,11 @@
 }
 
 .copy-button:hover:not(:disabled) {
-  background-color: #1f2937;
+  background-color: var(--color-primary-hover);
 }
 
 .copy-button:disabled {
-  background-color: #9ca3af;
+  background-color: var(--inverita-light-grey);
   cursor: not-allowed;
 }
 
@@ -139,7 +139,7 @@
   flex-direction: column;
   align-items: center;
   height: 100%;
-  width: 160px;
+  width: 180px;
   flex-shrink: 0;
   overflow: hidden;
   align-self: stretch;
@@ -147,8 +147,8 @@
 
 .portrait-container {
   position: relative;
-  width: 160px;
-  height: 160px;
+  width: 180px;
+  height: 180px;
   flex-shrink: 0;
 }
 
@@ -164,8 +164,8 @@
 }
 
 .logo-container {
-  height: 40px;
-  width: 160px;
+  height: 60px;
+  width: 180px;
   flex-shrink: 0;
   position: relative;
 }
@@ -274,7 +274,7 @@
   align-items: flex-start;
   min-height: 1px;
   min-width: 0;
-  height: 40px;
+  height: 60px;
   flex-shrink: 0;
   text-decoration: none;
   color: inherit;
@@ -314,7 +314,7 @@
 }
 
 .divider {
-  height: 40px;
+  height: 60px;
   width: 2px;
   flex-shrink: 0;
   background-color: transparent;
@@ -350,8 +350,8 @@
   min-height: 24px;
   min-width: 24px;
   overflow: visible;
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   flex-shrink: 0;
   text-decoration: none;
   color: inherit;
@@ -377,7 +377,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 40px;
+  height: 60px;
   align-items: center;
   padding: 0 8px;
   flex-shrink: 0;
@@ -447,8 +447,8 @@
 .linkedin-section.hidden {
   visibility: hidden;
   pointer-events: none;
-  height: 40px;
-  min-height: 40px;
+  height: 60px;
+  min-height: 60px;
 }
 
 /* Social icons should not take space when hidden */
@@ -466,14 +466,14 @@
 .website-link-container.hidden {
   visibility: hidden;
   pointer-events: none;
-  height: 40px;
-  min-height: 40px;
+  height: 60px;
+  min-height: 60px;
 }
 
 /* Email Test Section */
 .email-test-section {
-  margin-top: 40px;
-  padding-top: 40px;
+  margin-top: 60px;
+  padding-top: 60px;
   border-top: 2px solid #e0e0e0;
   width: 100%;
   max-width: 600px;
@@ -513,7 +513,7 @@
 
 .url-input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--inverita-blue);
 }
 
 .help-text {

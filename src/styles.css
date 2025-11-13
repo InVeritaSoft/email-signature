@@ -1,3 +1,28 @@
+/* INVERITA Brand Colors - CSS Custom Properties */
+:root {
+  /* Primary Brand Colors */
+  --inverita-blue: #0072DA;
+  --inverita-turquoise: #64CCC9;
+  --inverita-yellow: #F2EDA8;
+  
+  /* Additional Brand Colors */
+  --inverita-black: #231F20;
+  --inverita-white: #FFFFFF;
+  --inverita-light-grey: #E6E7E8;
+  
+  /* Semantic Color Mappings */
+  --color-primary: var(--inverita-blue);
+  --color-secondary: var(--inverita-turquoise);
+  --color-accent: var(--inverita-yellow);
+  --color-text: var(--inverita-black);
+  --color-background: var(--inverita-white);
+  --color-border: var(--inverita-light-grey);
+  
+  /* Color Variations (for hover states, etc.) */
+  --color-primary-hover: #0056a8;
+  --color-primary-light: #e6f2ff;
+}
+
 /* Global Styles */
 * {
   box-sizing: border-box;
@@ -41,18 +66,19 @@ body {
 
 /* Links */
 a {
-  color: #1976d2;
+  color: var(--inverita-blue);
   text-decoration: none;
 }
 
 a:hover {
   text-decoration: underline;
+  color: var(--color-primary-hover);
 }
 
 /* Buttons */
 button {
-  background-color: #1976d2;
-  color: white;
+  background-color: var(--inverita-blue);
+  color: var(--inverita-white);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -62,11 +88,11 @@ button {
 }
 
 button:hover {
-  background-color: #1565c0;
+  background-color: var(--color-primary-hover);
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: var(--inverita-light-grey);
   cursor: not-allowed;
 }
 
