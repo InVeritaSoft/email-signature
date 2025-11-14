@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, effect, computed } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  effect,
+  computed,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -7,7 +14,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SignatureStore } from '../store/signature.store';
+import { SignatureStore, SignatureVariant } from '../store/signature.store';
 
 @Component({
   selector: 'app-signature',
@@ -18,7 +25,7 @@ import { SignatureStore } from '../store/signature.store';
 })
 export class SignatureComponent implements OnInit {
   // Image assets (hardcoded - not editable)
-  readonly logoUrl = 'assets/516f9476ae82f86dc9aed7edb53d662b1027a057.svg';
+  readonly logoUrl = 'assets/logo.png';
   readonly facebookIconUrl =
     'assets/86fe2a2a805b38a53a570fffbfcedff5bee14c6e.svg';
   readonly youtubeIconUrl =
@@ -54,6 +61,7 @@ export class SignatureComponent implements OnInit {
       youtubeUrl: [state.youtubeUrl, [urlValidator]],
       linkedInSocialUrl: [state.linkedInSocialUrl, [urlValidator]],
       imageUrl: [state.imageUrl, [urlValidator]],
+      variant: [state.variant],
     });
 
     // Sync form values to store on change
@@ -82,6 +90,7 @@ export class SignatureComponent implements OnInit {
       const youtubeUrl = this.store.youtubeUrl();
       const linkedInSocialUrl = this.store.linkedInSocialUrl();
       const imageUrl = this.store.imageUrl();
+      const variant = this.store.variant();
 
       // Only update if form values differ to avoid infinite loops
       const formValue = this.signatureForm.value;
@@ -95,7 +104,8 @@ export class SignatureComponent implements OnInit {
         formValue.facebookUrl !== facebookUrl ||
         formValue.youtubeUrl !== youtubeUrl ||
         formValue.linkedInSocialUrl !== linkedInSocialUrl ||
-        formValue.imageUrl !== imageUrl;
+        formValue.imageUrl !== imageUrl ||
+        formValue.variant !== variant;
 
       if (hasChanges) {
         const state = this.store.state();
@@ -135,9 +145,10 @@ export class SignatureComponent implements OnInit {
     const baseUrlValue = this.baseUrl();
 
     // Get current state and pass to generation method
+    // For preview, use just the signature content (not full document)
     const state = this.store.state();
-    const html = this.store.generateEmailHtml(baseUrlValue, state);
-    return this.sanitizer.bypassSecurityTrustHtml(html);
+    const signature = this.store.generateEmailSignature(baseUrlValue, state);
+    return this.sanitizer.bypassSecurityTrustHtml(signature);
   });
 
   readonly emailSignatureString = computed(() => {
@@ -152,6 +163,7 @@ export class SignatureComponent implements OnInit {
     this.store.youtubeUrl();
     this.store.linkedInSocialUrl();
     this.store.imageUrl();
+    this.store.variant();
     const baseUrlValue = this.baseUrl();
 
     // Get current state and pass to generation method
@@ -171,6 +183,7 @@ export class SignatureComponent implements OnInit {
     this.store.youtubeUrl();
     this.store.linkedInSocialUrl();
     this.store.imageUrl();
+    this.store.variant();
     const baseUrlValue = this.baseUrl();
 
     // Get current state and pass to generation method
@@ -268,5 +281,36 @@ export class SignatureComponent implements OnInit {
       console.error('Failed to copy:', err);
       alert('Failed to copy to clipboard');
     }
+  }
+
+  /**
+   * Updates the selected variant
+   */
+  selectVariant(variant: SignatureVariant): void {
+    this.store.updateVariant(variant);
+    this.signatureForm.patchValue({ variant }, { emitEvent: false });
+  }
+
+  /**
+   * Get available variants
+   */
+  readonly variants: SignatureVariant[] = [
+    SignatureVariant.Classic,
+    SignatureVariant.Dark,
+    SignatureVariant.Gradient,
+    SignatureVariant.Vertical,
+    SignatureVariant.Quadrant,
+    SignatureVariant.HorizontalLogo,
+    SignatureVariant.GradientBlue,
+  ];
+
+  /**
+   * Get display name for variant (handles hyphenated names)
+   */
+  getVariantDisplayName(variant: SignatureVariant): string {
+    return variant
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

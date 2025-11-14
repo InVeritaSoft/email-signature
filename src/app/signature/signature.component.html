@@ -2,6 +2,24 @@
   <!-- Form Section -->
   <div class="form-container">
     <h2>Signature Generator</h2>
+
+    <!-- Variant Selector -->
+    <div class="variant-selector-section">
+      <label class="variant-label">Choose Signature Style:</label>
+      <div class="variant-thumbnails">
+        <div
+          *ngFor="let variant of variants"
+          class="variant-thumbnail"
+          [class.active]="store.variant() === variant"
+          (click)="selectVariant(variant)"
+          [title]="getVariantDisplayName(variant)"
+        >
+          <div class="thumbnail-preview" [class]="'preview-' + variant"></div>
+          <span class="variant-name">{{ getVariantDisplayName(variant) }}</span>
+        </div>
+      </div>
+    </div>
+
     <form [formGroup]="signatureForm" class="signature-form">
       <div class="form-group">
         <label for="name">Name *</label>
@@ -242,13 +260,23 @@
   <!-- Preview Section -->
   <div class="preview-container">
     <h2>Preview</h2>
-    <div class="signature-container" data-node-id="136:143">
-      <div class="signature-content" data-node-id="136:144">
+    <div
+      class="signature-container"
+      [class]="'variant-' + store.variant()"
+      data-node-id="136:143"
+    >
+      <div
+        class="signature-content"
+        [class]="'variant-' + store.variant()"
+        data-node-id="136:144"
+      >
         <!-- Left Column: Portrait and Logo -->
         <div class="left-column" data-node-id="136:145">
+          <!-- Photo Section -->
           <div
-            class="portrait-container"
+            class="portrait-container photo-section"
             data-name="portrait-image"
+            data-section="photo-section"
             data-node-id="136:146"
           >
             <img
@@ -257,9 +285,11 @@
               class="portrait-image"
             />
           </div>
+          <!-- Logo Section -->
           <div
-            class="logo-container"
+            class="logo-container logo-section"
             data-name="company-logo"
+            data-section="logo-section"
             data-node-id="136:147"
           >
             <img [src]="logoUrl" [alt]="'Inverita logo'" class="logo-image" />
@@ -268,7 +298,11 @@
 
         <!-- Right Column: Contact Information -->
         <div class="right-column" data-node-id="136:159">
-          <div class="contact-info-container">
+          <!-- Personal Info Section -->
+          <div
+            class="contact-info-container personal-section"
+            data-section="personal-section"
+          >
             <!-- Name and Title Section -->
             <div class="contact-info" data-node-id="136:160">
               <div class="contact-details" data-node-id="136:161">
@@ -301,8 +335,12 @@
             </div>
           </div>
 
-          <!-- Social Media Icons and Website Section -->
-          <div class="social-section" data-node-id="136:167">
+          <!-- Social Info Section -->
+          <div
+            class="social-section social-info-section"
+            data-section="social-section"
+            data-node-id="136:167"
+          >
             <div class="divider" data-node-id="136:168"></div>
             <div class="social-content" data-node-id="136:169">
               <div class="social-icons" data-node-id="136:170">
@@ -408,7 +446,7 @@
         <div class="email-preview-container" [innerHTML]="emailHtml()"></div>
       </div>
 
-      <div class="code-section">
+      <!-- <div class="code-section">
         <div class="code-block">
           <div class="code-header">
             <h3>Email Signature HTML (for direct insertion)</h3>
@@ -434,7 +472,7 @@
           </div>
           <pre class="code-content">{{ emailHtmlString() }}</pre>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>

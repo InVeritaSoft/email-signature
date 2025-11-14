@@ -1,15 +1,15 @@
 /* INVERITA Brand Colors - CSS Custom Properties */
 :root {
   /* Primary Brand Colors */
-  --inverita-blue: #0072DA;
-  --inverita-turquoise: #64CCC9;
-  --inverita-yellow: #F2EDA8;
-  
+  --inverita-blue: #0072da;
+  --inverita-turquoise: #64ccc9;
+  --inverita-yellow: #f2eda8;
+
   /* Additional Brand Colors */
-  --inverita-black: #231F20;
-  --inverita-white: #FFFFFF;
-  --inverita-light-grey: #E6E7E8;
-  
+  --inverita-black: #231f20;
+  --inverita-white: #ffffff;
+  --inverita-light-grey: #e6e7e8;
+
   /* Semantic Color Mappings */
   --color-primary: var(--inverita-blue);
   --color-secondary: var(--inverita-turquoise);
@@ -17,10 +17,27 @@
   --color-text: var(--inverita-black);
   --color-background: var(--inverita-white);
   --color-border: var(--inverita-light-grey);
-  
+
   /* Color Variations (for hover states, etc.) */
   --color-primary-hover: #0056a8;
   --color-primary-light: #e6f2ff;
+
+  /* Brand Gradients */
+  --gradient-default: linear-gradient(
+    170deg,
+    #006be5 18.6%,
+    #7ad0cb 69.44%,
+    #e0eeb5 96.99%,
+    #faf6af 116.16%,
+    #fff 185.73%
+  );
+  --gradient-blue: linear-gradient(
+    163deg,
+    #006be5 29.75%,
+    #7ad0cb 95.77%,
+    #e0eeb5 127.99%,
+    #faf6af 184.3%
+  );
 }
 
 /* Global Styles */
@@ -30,9 +47,11 @@
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #333;
@@ -54,15 +73,31 @@ body {
   text-align: center;
 }
 
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-.mt-4 { margin-top: 2rem; }
+.mt-1 {
+  margin-top: 0.5rem;
+}
+.mt-2 {
+  margin-top: 1rem;
+}
+.mt-3 {
+  margin-top: 1.5rem;
+}
+.mt-4 {
+  margin-top: 2rem;
+}
 
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mb-4 { margin-bottom: 2rem; }
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+.mb-2 {
+  margin-bottom: 1rem;
+}
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+.mb-4 {
+  margin-bottom: 2rem;
+}
 
 /* Links */
 a {
@@ -95,4 +130,3 @@ button:disabled {
   background-color: var(--inverita-light-grey);
   cursor: not-allowed;
 }
-

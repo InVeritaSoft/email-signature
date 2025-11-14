@@ -120,17 +120,19 @@
 
 .signature-container {
   background-color: #fbfbfb;
-  padding: 4px 3px;
+  padding: 0;
   width: 600px;
   display: inline-block;
+  border: 0;
 }
 
 .signature-content {
-  background-color: white;
+  background-color: transparent;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   flex-direction: row;
+  gap: 0;
 }
 
 /* Left Column Styles */
@@ -143,6 +145,7 @@
   flex-shrink: 0;
   overflow: hidden;
   align-self: stretch;
+  gap: 0;
 }
 
 .portrait-container {
@@ -150,6 +153,7 @@
   width: 180px;
   height: 180px;
   flex-shrink: 0;
+  background-color: #e6e7e8;
 }
 
 .portrait-image {
@@ -168,13 +172,16 @@
   width: 180px;
   flex-shrink: 0;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-image {
   display: block;
   max-width: none;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: 25px;
 }
 
 /* Right Column Styles */
@@ -183,18 +190,18 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  background-color: #cbcbcb;
+  background-color: transparent;
   height: 100%;
   min-height: 1px;
   min-width: 0;
   overflow: hidden;
   flex-shrink: 0;
   align-self: stretch;
+  gap: 0;
 }
 
 .contact-info {
   flex: 1 0 0;
-  background-color: #fbfbfb;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -266,7 +273,6 @@
 
 .linkedin-link {
   flex: 1 0 0;
-  background-color: #fbfbfb;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -434,7 +440,8 @@
   grid-auto-flow: row;
   width: 100%;
   padding: 20px;
-  background: #fbfbfb;
+  background-color: #e6e7e8;
+  border: 0;
 }
 
 /* Hidden elements - maintain layout space to prevent jumping */
@@ -524,10 +531,10 @@
 
 .preview-section {
   margin-bottom: 30px;
-  padding: 20px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 .preview-section h3 {
@@ -536,11 +543,13 @@
 }
 
 .email-preview-container {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border: 1px solid #eee;
-  border-radius: 4px;
+  background-color: #fbfbfb;
+  padding: 40px;
+  border: 0;
+  border-radius: 0;
   overflow-x: auto;
+  width: 600px;
+  display: inline-block;
 }
 
 .code-section {
@@ -576,7 +585,7 @@
   padding: 20px;
   background-color: #f8f9fa;
   overflow-x: auto;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 12px;
   line-height: 1.5;
   color: #333;
@@ -584,4 +593,373 @@
   word-wrap: break-word;
   max-height: 500px;
   overflow-y: auto;
+}
+
+/* Variant Selector Styles */
+.variant-selector-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.variant-label {
+  display: block;
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #101828;
+  margin-bottom: 15px;
+}
+
+.variant-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+}
+
+.variant-thumbnail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #d0d5dd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #ffffff;
+}
+
+.variant-thumbnail:hover {
+  border-color: var(--inverita-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.variant-thumbnail.active {
+  border-color: var(--inverita-blue);
+  background-color: var(--color-primary-light);
+  box-shadow: 0 0 0 3px rgba(0, 114, 218, 0.1);
+}
+
+.thumbnail-preview {
+  width: 80px;
+  height: 50px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid #e0e0e0;
+  background-size: cover;
+  background-position: center;
+}
+
+.preview-classic {
+  background: linear-gradient(to right, #fbfbfb 30%, #cbcbcb 30%);
+}
+
+.preview-dark {
+  background: linear-gradient(to right, #231f20 30%, #231f20 30%);
+  border-color: #231f20;
+}
+
+.preview-gradient {
+  background: linear-gradient(to right, #0072da, #64ccc9, #f2eda8);
+}
+
+.preview-vertical {
+  background: linear-gradient(to bottom, #0072da, #64ccc9);
+}
+
+.preview-quadrant {
+  background: linear-gradient(to right, #e6e7e8 50%, #231f20 50%),
+    linear-gradient(to right, #0072da 50%, #64ccc9 50%);
+  background-size: 100% 50%, 100% 50%;
+  background-position: top, bottom;
+  background-repeat: no-repeat;
+}
+
+.preview-horizontal-logo {
+  background: linear-gradient(to right, #0072da, #64ccc9);
+}
+
+.preview-gradient-blue {
+  background: linear-gradient(to right, #e6e7e8 30%, #0072da 30%);
+}
+
+.variant-name {
+  font-family: "Montserrat", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #101828;
+  text-align: center;
+}
+
+.variant-thumbnail.active .variant-name {
+  color: var(--inverita-blue);
+}
+
+/* Variant-specific preview styles */
+.signature-container.variant-dark {
+  background-color: #231f20;
+}
+
+.signature-container.variant-gradient {
+  background: var(--gradient-default);
+  border: 0;
+  padding: 0;
+}
+
+.signature-container.variant-gradient .signature-content {
+  gap: 1px;
+}
+
+.signature-container.variant-gradient .left-column {
+  gap: 1px;
+}
+
+.signature-container.variant-gradient .right-column {
+  gap: 1px;
+}
+
+.signature-container.variant-vertical {
+  background: linear-gradient(to bottom, #0072da, #64ccc9);
+}
+
+.signature-container.variant-quadrant {
+  background: var(--gradient-blue);
+  border: 0;
+  padding: 0;
+}
+
+.signature-container.variant-quadrant .signature-content {
+  gap: 2px;
+}
+
+.signature-container.variant-quadrant .left-column {
+  gap: 2px;
+}
+
+.signature-container.variant-quadrant .right-column {
+  gap: 2px;
+}
+
+.signature-container.variant-horizontal-logo {
+  background: linear-gradient(to right, #0072da, #64ccc9);
+}
+
+.signature-container.variant-gradient-blue {
+  background: var(--gradient-blue);
+  border: 0;
+  padding: 0;
+}
+
+.signature-container.variant-gradient-blue .signature-content {
+  gap: 1px;
+}
+
+.signature-container.variant-gradient-blue .left-column {
+  gap: 1px;
+}
+
+.signature-container.variant-gradient-blue .right-column {
+  gap: 1px;
+}
+
+/* Variant-specific logo container backgrounds for white logo visibility */
+.signature-container.variant-classic .logo-container {
+  background: linear-gradient(30deg, #0072da 0%, #0056b3 100%);
+}
+
+.signature-container.variant-dark .logo-container {
+  background-color: #231f20;
+}
+
+.signature-container.variant-dark .logo-image {
+  filter: brightness(0) invert(1);
+}
+
+.signature-container.variant-vertical .logo-container,
+.signature-container.variant-horizontal-logo .logo-container {
+  background-color: #0072da; /* Blue background for white logo visibility */
+}
+
+.signature-container.variant-gradient .logo-container {
+  background-color: #0072da;
+}
+
+.signature-container.variant-gradient .logo-image {
+  filter: brightness(0) invert(1);
+}
+
+.signature-container.variant-gradient-blue .logo-container {
+  background-color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .logo-image {
+  filter: brightness(0);
+}
+
+.signature-container.variant-quadrant .logo-container {
+  background-color: #231f20;
+}
+
+.signature-container.variant-quadrant .logo-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Variant-specific contact-info-container backgrounds */
+.signature-container.variant-classic .contact-info-container {
+  background-color: #e6e7e8;
+}
+
+.signature-container.variant-dark .contact-info-container {
+  background-color: #231f20;
+}
+
+.signature-container.variant-vertical .contact-info-container,
+.signature-container.variant-horizontal-logo .contact-info-container {
+  background-color: #fbfbfb;
+}
+
+.signature-container.variant-gradient .contact-info-container {
+  background-color: transparent;
+}
+
+.signature-container.variant-gradient .social-section {
+  background-color: transparent;
+  border-top: 1px solid #ffffff;
+  height: 59px;
+}
+
+.signature-container.variant-gradient-blue .contact-info-container {
+  background-color: transparent;
+}
+
+.signature-container.variant-gradient-blue .social-section {
+  background-color: transparent;
+  border-top: 1px solid #ffffff;
+  height: 59px;
+}
+
+.signature-container.variant-quadrant .contact-info-container {
+  background-color: #231f20;
+}
+
+.signature-container.variant-quadrant .social-section {
+  background-color: #231f20;
+}
+
+/* Variant-specific social section backgrounds */
+.signature-container.variant-classic .social-section {
+  background-color: #808080;
+}
+
+.signature-container.variant-dark .social-section {
+  background: var(--gradient-blue);
+}
+
+/* Variant-specific text colors for dark variant */
+.signature-container.variant-dark .name {
+  color: #ffffff;
+}
+
+.signature-container.variant-dark .title {
+  color: #ffffff;
+}
+
+.signature-container.variant-dark .linkedin-text {
+  color: #ffffff;
+}
+
+.signature-container.variant-dark .website-link {
+  color: #ffffff;
+}
+
+.signature-container.variant-dark .website-link p {
+  color: #ffffff;
+}
+
+/* Variant-specific social icon colors for dark variant */
+.signature-container.variant-dark .icon-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Variant-specific text colors for quadrant variant */
+.signature-container.variant-quadrant .name {
+  color: #ffffff;
+}
+
+.signature-container.variant-quadrant .title {
+  color: #ffffff;
+}
+
+.signature-container.variant-quadrant .linkedin-text {
+  color: #ffffff;
+}
+
+.signature-container.variant-quadrant .website-link {
+  color: #ffffff;
+}
+
+.signature-container.variant-quadrant .website-link p {
+  color: #ffffff;
+}
+
+.signature-container.variant-quadrant .icon-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Variant-specific text colors for gradient-blue variant */
+.signature-container.variant-gradient-blue .name {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .title {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .linkedin-text {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .website-link {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .website-link p {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient-blue .icon-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Variant-specific text colors for gradient variant */
+.signature-container.variant-gradient .name {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient .title {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient .linkedin-text {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient .website-link {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient .website-link p {
+  color: #ffffff;
+}
+
+.signature-container.variant-gradient .icon-image {
+  filter: brightness(0) invert(1);
+}
+
+/* Variant-specific linkedin link backgrounds */
+.signature-container.variant-classic .linkedin-link {
+  background-color: #e6e7e8;
 }

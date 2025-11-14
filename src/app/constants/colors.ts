@@ -43,3 +43,22 @@ export const COLORS = {
   primaryLight: INVERITA_COLORS.blueLight,
 } as const;
 
+/**
+ * Brand Gradients
+ * 
+ * Reusable gradient definitions for consistent styling across the application.
+ */
+export const GRADIENTS = {
+  /**
+   * Default brand gradient (also used as blue gradient)
+   * Multi-color gradient from blue to turquoise to yellow to white
+   */
+  default: 'linear-gradient(163deg, #006BE5 6.89%, #7AD0CB 51.29%, #E0EEB5 86.54%, #FAF6AF 105.16%, #FFF 181.75%)',
+  
+  /**
+   * Blue gradient (same as default)
+   * Alias for default gradient for semantic clarity
+   */
+  blue: 'linear-gradient(163deg, #006BE5 6.89%, #7AD0CB 51.29%, #E0EEB5 86.54%, #FAF6AF 105.16%, #FFF 181.75%)',
+} as const;
+
