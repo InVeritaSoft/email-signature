@@ -40,6 +40,7 @@ export class SignatureComponent implements OnInit {
 
   signatureForm: FormGroup;
   readonly copySuccess = signal(false);
+  readonly emailPreviewCopySuccess = signal(false);
   readonly baseUrl = signal('');
   readonly emailHtmlWithBase64 = signal<SafeHtml | null>(null);
   readonly formSubmitted = signal(false);
@@ -349,36 +350,67 @@ export class SignatureComponent implements OnInit {
   }
 
   /**
-   * Copies the email preview HTML to clipboard
+   * Copies the email preview HTML to clipboard (rendered HTML as displayed)
    */
   async copyEmailPreviewToClipboard(): Promise<void> {
     try {
-      const html = this.emailSignatureString();
-      await navigator.clipboard.writeText(html);
-      this.copySuccess.set(true);
+      // Get the rendered HTML from the email preview container
+      const previewContainer = document.querySelector('.email-preview-container');
+      if (!previewContainer) {
+        console.error('Email preview container not found');
+        return;
+      }
+
+      // Get the innerHTML which contains the rendered signature
+      const renderedHtml = previewContainer.innerHTML;
+      
+      // Copy as HTML to clipboard (preserves formatting)
+      const clipboardItem = new ClipboardItem({
+        'text/html': new Blob([renderedHtml], { type: 'text/html' }),
+        'text/plain': new Blob([renderedHtml], { type: 'text/plain' })
+      });
+      
+      await navigator.clipboard.write([clipboardItem]);
+      this.emailPreviewCopySuccess.set(true);
       setTimeout(() => {
-        this.copySuccess.set(false);
+        this.emailPreviewCopySuccess.set(false);
       }, 2000);
     } catch (err) {
       console.error('Failed to copy email preview to clipboard:', err);
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = this.emailSignatureString();
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.select();
+      // Fallback: try copying as plain text HTML
       try {
-        document.execCommand('copy');
-        this.copySuccess.set(true);
-        setTimeout(() => {
-          this.copySuccess.set(false);
-        }, 2000);
+        const previewContainer = document.querySelector('.email-preview-container');
+        if (previewContainer) {
+          const renderedHtml = previewContainer.innerHTML;
+          await navigator.clipboard.writeText(renderedHtml);
+          this.emailPreviewCopySuccess.set(true);
+          setTimeout(() => {
+            this.emailPreviewCopySuccess.set(false);
+          }, 2000);
+        }
       } catch (fallbackErr) {
         console.error('Fallback copy failed:', fallbackErr);
-        alert('Failed to copy to clipboard');
+        // Final fallback using execCommand
+        const previewContainer = document.querySelector('.email-preview-container');
+        if (previewContainer) {
+          const textArea = document.createElement('textarea');
+          textArea.value = previewContainer.innerHTML;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            this.emailPreviewCopySuccess.set(true);
+            setTimeout(() => {
+              this.emailPreviewCopySuccess.set(false);
+            }, 2000);
+          } catch (execErr) {
+            console.error('execCommand copy failed:', execErr);
+          }
+          document.body.removeChild(textArea);
+        }
       }
-      document.body.removeChild(textArea);
     }
   }
 

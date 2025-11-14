@@ -206,13 +206,18 @@
       <div class="preview-section">
         <div class="preview-header">
           <h3>Email Preview</h3>
-          <button
-            type="button"
-            (click)="copyEmailPreviewToClipboard()"
-            class="copy-email-button"
-          >
-            Copy Email Preview to Clipboard
-          </button>
+          <div class="copy-email-wrapper">
+            <button
+              type="button"
+              (click)="copyEmailPreviewToClipboard()"
+              class="copy-email-button"
+            >
+              Copy Email Preview to Clipboard
+            </button>
+            <div *ngIf="emailPreviewCopySuccess()" class="email-copy-success">
+              ✓ Copied!
+            </div>
+          </div>
         </div>
         <div class="email-preview-container" [innerHTML]="emailHtml()"></div>
       </div>
@@ -471,11 +476,8 @@
 
       <div class="form-actions">
         <button type="button" (click)="copyToClipboard()" class="copy-button">
-          Copy HTML to Clipboard
+          Validate
         </button>
-        <div *ngIf="copySuccess()" class="success-message">
-          ✓ Copied to clipboard!
-        </div>
       </div>
     </form>
   </div>
