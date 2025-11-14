@@ -42,6 +42,7 @@ export class SignatureComponent implements OnInit {
   readonly copySuccess = signal(false);
   readonly baseUrl = signal('');
   readonly emailHtmlWithBase64 = signal<SafeHtml | null>(null);
+  readonly formSubmitted = signal(false);
   private lastSignatureHash = signal<string>('');
   private isConverting = false;
 
@@ -292,6 +293,19 @@ export class SignatureComponent implements OnInit {
    * Copies the generated HTML signature to clipboard
    */
   async copyToClipboard(): Promise<void> {
+    // Mark form as submitted to show validation errors
+    this.formSubmitted.set(true);
+    
+    // Mark all form controls as touched to trigger validation display
+    Object.keys(this.signatureForm.controls).forEach(key => {
+      this.signatureForm.get(key)?.markAsTouched();
+    });
+
+    // If form is invalid, don't proceed with copy
+    if (this.signatureForm.invalid) {
+      return;
+    }
+
     try {
       const html = this.generateEmailSignature();
       await navigator.clipboard.writeText(html);
@@ -331,6 +345,40 @@ export class SignatureComponent implements OnInit {
     } catch (err) {
       console.error('Failed to copy:', err);
       alert('Failed to copy to clipboard');
+    }
+  }
+
+  /**
+   * Copies the email preview HTML to clipboard
+   */
+  async copyEmailPreviewToClipboard(): Promise<void> {
+    try {
+      const html = this.emailSignatureString();
+      await navigator.clipboard.writeText(html);
+      this.copySuccess.set(true);
+      setTimeout(() => {
+        this.copySuccess.set(false);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy email preview to clipboard:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = this.emailSignatureString();
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        this.copySuccess.set(true);
+        setTimeout(() => {
+          this.copySuccess.set(false);
+        }, 2000);
+      } catch (fallbackErr) {
+        console.error('Fallback copy failed:', fallbackErr);
+        alert('Failed to copy to clipboard');
+      }
+      document.body.removeChild(textArea);
     }
   }
 
