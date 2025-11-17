@@ -1,72 +1,34 @@
-# GitHub Actions Workflows
+# GitHub Workflows Configuration
 
-## Deploy Policies to GitHub Pages
+This directory contains GitHub Actions workflows configured for different remotes.
 
-This workflow automatically deploys the `policies` folder to GitHub Pages following the [official GitHub documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow).
+## Repository-Specific Workflows
 
-### Setup Instructions
+- **`origin-workflow.yml`**: Runs on `InVeritaSoft/email-signature-generator` (origin remote)
+  - Triggers: Push/PR to main or develop branches
+  - Actions: Install, test, and build
 
-1. **Enable GitHub Pages with GitHub Actions:**
-   - Go to your repository on GitHub
-   - Navigate to **Settings** → **Pages**
-   - Under **Build and deployment**, under **Source**, select **GitHub Actions** (not "Deploy from a branch")
-   - Save the settings
-   - GitHub will automatically create a `github-pages` environment if it doesn't exist
+- **`deploy-policies.yml`**: Runs on `InVeritaSoft/email-signature-generator` (origin remote)
+  - Triggers: Push to main/master/extension branches (when policies/** change) or manual dispatch
+  - Actions: Deploy Privacy Policies to GitHub Pages from `policies/` directory
 
-2. **Push the workflow file:**
-   - The workflow file is located at `.github/workflows/deploy-policies.yml`
-   - Push it to your `main` or `master` branch
+- **`hosting-workflow.yml`**: Runs on `InVeritaSoft/email-signature` (hosting remote)
+  - Triggers: Push to main branch or manual dispatch
+  - Actions: Build Angular application and deploy `dist/signature/browser` to GitHub Pages (serves index.html)
 
-3. **Your privacy policy will be available at:**
-   - `https://[your-username].github.io/[repository-name]/`
-   - Or if using a custom domain: `https://yourdomain.com/`
+## How It Works
 
-### How It Works
+Each workflow uses a conditional check:
+```yaml
+if: github.repository == 'InVeritaSoft/email-signature-generator'
+```
 
-Following the [GitHub Pages workflow pattern](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-with-a-custom-github-actions-workflow):
+This ensures workflows only execute on their intended repository, even if the same workflow files exist in both remotes.
 
-1. **Trigger:** Workflow runs when:
-   - Changes are pushed to `main` or `master` branch in the `policies/` folder
-   - The workflow file itself is updated
-   - Manually triggered from the Actions tab
+## Pushing to Remotes
 
-2. **Checkout:** Uses `actions/checkout@v4` to check out repository contents
+When you push to either remote:
+- `git push origin main` → Triggers origin-workflow.yml and deploy-policies.yml on email-signature-generator repo
+- `git push hosting main` → Triggers hosting-workflow.yml on email-signature repo (builds Angular and deploys to GitHub Pages)
 
-3. **Setup:** Uses `actions/configure-pages@v4` to configure GitHub Pages
-
-4. **Build:** Copies the `policies/` folder contents to `_site/` directory
-
-5. **Upload:** Uses `actions/upload-pages-artifact@v3` to upload static files as an artifact
-
-6. **Deploy:** Uses `actions/deploy-pages@v4` to deploy the artifact to GitHub Pages
-
-### Manual Trigger
-
-You can manually trigger the deployment:
-- Go to **Actions** tab in your repository
-- Select **Deploy Policies to GitHub Pages** workflow
-- Click **Run workflow** button
-
-### Permissions
-
-The workflow uses the following permissions (as required by GitHub):
-- `contents: read` - To read repository contents
-- `pages: write` - To write to GitHub Pages
-- `id-token: write` - For OIDC authentication
-
-### Notes
-
-- The workflow follows the official GitHub Pages workflow pattern
-- It uses the `github-pages` deployment environment
-- Only one deployment runs at a time (concurrency control)
-- Your privacy policy will be accessible at the root of your GitHub Pages site
-- The workflow only triggers on changes to `policies/` folder to avoid unnecessary builds
-
-### Troubleshooting
-
-If the site doesn't deploy:
-1. Check the **Actions** tab for workflow run status
-2. Verify GitHub Pages is set to use **GitHub Actions** as the source
-3. Ensure the `github-pages` environment exists (created automatically)
-4. Check that files in `policies/` folder are valid HTML
-
+Both workflow files can exist in your local repo and will be pushed to both remotes, but each will only run on its designated repository.

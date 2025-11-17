@@ -28,6 +28,8 @@ concurrency:
 
 jobs:
   deploy:
+    # Only run on origin repository
+    if: github.repository == 'InVeritaSoft/email-signature-generator'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
