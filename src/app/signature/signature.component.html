@@ -262,19 +262,21 @@
         <label for="imageUrl">Portrait Image</label>
         <div class="image-upload-container">
           <div class="upload-section">
-            <label for="imageUpload" class="upload-button">
-              <span>📷 Upload Image</span>
+            <label for="imageUpload" class="upload-button" [class.disabled]="imageProcessing()">
+              <span *ngIf="!imageProcessing()">📷 Upload Image</span>
+              <span *ngIf="imageProcessing()">⏳ Processing...</span>
               <input
                 id="imageUpload"
                 type="file"
                 accept="image/jpeg,image/jpg,image/png"
                 (change)="onImageUpload($event)"
+                [disabled]="imageProcessing()"
                 style="display: none"
               />
             </label>
-            <span class="upload-hint">JPG, JPEG, or PNG (max 5MB)</span>
+            <span class="upload-hint">JPG, JPEG, or PNG (automatically optimized)</span>
             <button
-              *ngIf="store.imageUrl()"
+              *ngIf="store.imageUrl() && !imageProcessing()"
               type="button"
               class="clear-image-button"
               (click)="clearImage()"

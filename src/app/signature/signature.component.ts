@@ -15,6 +15,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SignatureStore, SignatureVariant } from '../store/signature.store';
+import { ImageProcessorService } from '../services/image-processor.service';
 
 @Component({
   selector: 'app-signature',
@@ -31,6 +32,7 @@ export class SignatureComponent implements OnInit {
   readonly store = inject(SignatureStore);
   private readonly fb = inject(FormBuilder);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly imageProcessor = inject(ImageProcessorService);
 
   signatureForm: FormGroup;
   readonly copySuccess = signal(false);
@@ -38,6 +40,7 @@ export class SignatureComponent implements OnInit {
   readonly baseUrl = signal('');
   readonly emailHtmlWithBase64 = signal<SafeHtml | null>(null);
   readonly formSubmitted = signal(false);
+  readonly imageProcessing = signal(false);
   private lastSignatureHash = signal<string>('');
   private isConverting = false;
 
@@ -489,7 +492,7 @@ export class SignatureComponent implements OnInit {
   }
 
   /**
-   * Handles image file upload and converts to base64
+   * Handles image file upload, processes (resizes and centers face), and converts to base64
    */
   async onImageUpload(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
@@ -507,25 +510,36 @@ export class SignatureComponent implements OnInit {
       return;
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      alert('Image size must be less than 5MB');
-      input.value = ''; // Reset input
-      return;
-    }
-
+    // No size or dimension limits - image processor handles all optimization
     try {
-      // Convert file to base64
-      const base64 = await this.fileToBase64(file);
+      // Show processing indicator
+      this.imageProcessing.set(true);
+      
+      // Process image: resize and center face
+      const base64 = await this.imageProcessor.processImage(
+        file,
+        800, // max dimension before processing
+        400  // target size for final output (square)
+      );
 
-      // Update form and store with base64 data URL
+      // Update form and store with processed base64 data URL
       this.signatureForm.patchValue({ imageUrl: base64 }, { emitEvent: false });
       this.store.updateImageUrl(base64);
+      this.imageProcessing.set(false);
     } catch (error) {
-      console.error('Failed to convert image to base64:', error);
-      alert('Failed to upload image. Please try again.');
-      input.value = ''; // Reset input
+      console.error('Failed to process image:', error);
+      // Fallback to original file conversion if processing fails
+      try {
+        const base64 = await this.fileToBase64(file);
+        this.signatureForm.patchValue({ imageUrl: base64 }, { emitEvent: false });
+        this.store.updateImageUrl(base64);
+        this.imageProcessing.set(false);
+      } catch (fallbackError) {
+        console.error('Failed to convert image to base64:', fallbackError);
+        this.imageProcessing.set(false);
+        alert('Failed to upload image. Please try again.');
+        input.value = ''; // Reset input
+      }
     }
   }
 
