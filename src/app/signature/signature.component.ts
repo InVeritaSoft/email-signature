@@ -559,6 +559,71 @@ export class SignatureComponent implements OnInit {
   }
 
   /**
+   * Handles blur event on image URL input - converts URL to base64 data URL
+   */
+  async onImageUrlBlur(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const url = input.value?.trim();
+
+    // Skip if empty or already a data URL
+    if (!url || url.startsWith('data:image/')) {
+      return;
+    }
+
+    // Only process HTTP/HTTPS URLs
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return;
+    }
+
+    try {
+      // Show processing indicator
+      this.imageProcessing.set(true);
+
+      // Fetch the image
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+
+      // Get image as blob
+      const blob = await response.blob();
+
+      // Validate it's an image
+      if (!blob.type.startsWith('image/')) {
+        throw new Error('URL does not point to a valid image');
+      }
+
+      // Convert to base64
+      const base64 = await this.blobToBase64(blob);
+
+      // Update form and store with base64 data URL
+      this.signatureForm.patchValue({ imageUrl: base64 }, { emitEvent: false });
+      this.store.updateImageUrl(base64);
+      this.imageProcessing.set(false);
+    } catch (error) {
+      console.error('Failed to convert image URL to base64:', error);
+      this.imageProcessing.set(false);
+      // Don't show alert - just log the error and keep the original URL
+      // User can still use the URL as-is if conversion fails
+    }
+  }
+
+  /**
+   * Converts a blob to base64 data URL
+   */
+  private blobToBase64(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  /**
    * Clears the uploaded image
    */
   clearImage(): void {
@@ -570,6 +635,30 @@ export class SignatureComponent implements OnInit {
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
+    }
+  }
+
+  /**
+   * Clears personal data cache and resets to default values
+   */
+  clearCache(): void {
+    if (confirm('Are you sure you want to clear all cached personal data? This will reset your name, title, LinkedIn URL, and photo.')) {
+      this.store.clearPersonalDataCache();
+      // Update form to reflect reset values
+      const state = this.store.state();
+      this.signatureForm.patchValue({
+        name: state.name,
+        title: state.title,
+        linkedInUrl: state.linkedInUrl,
+        imageUrl: state.imageUrl,
+      }, { emitEvent: false });
+      // Reset file input if it exists
+      const fileInput = document.getElementById(
+        'imageUpload'
+      ) as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
     }
   }
 }

@@ -4,6 +4,9 @@ import type {
   BlazeFaceModel,
   NormalizedFace,
 } from '@tensorflow-models/blazeface';
+import * as tf from '@tensorflow/tfjs-core';
+import '@tensorflow/tfjs-backend-webgl';
+import '@tensorflow/tfjs-backend-cpu';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +14,34 @@ import type {
 export class ImageProcessorService {
   private model: BlazeFaceModel | null = null;
   private modelLoading = false;
+  private backendInitialized = false;
+
+  /**
+   * Initializes TensorFlow.js backend
+   */
+  private async initializeBackend(): Promise<void> {
+    if (this.backendInitialized) {
+      return;
+    }
+
+    try {
+      // Try to set WebGL backend (faster, GPU-accelerated)
+      await tf.setBackend('webgl');
+      await tf.ready();
+      this.backendInitialized = true;
+    } catch (error) {
+      // Fallback to CPU backend if WebGL fails
+      try {
+        await tf.setBackend('cpu');
+        await tf.ready();
+        this.backendInitialized = true;
+        console.warn('WebGL backend not available, using CPU backend');
+      } catch (cpuError) {
+        console.error('Failed to initialize TensorFlow.js backend:', cpuError);
+        throw cpuError;
+      }
+    }
+  }
 
   /**
    * Loads the BlazeFace model (lazy loading)
@@ -32,6 +63,8 @@ export class ImageProcessorService {
 
     this.modelLoading = true;
     try {
+      // Initialize backend before loading model
+      await this.initializeBackend();
       this.model = await blazeface.load();
       this.modelLoading = false;
       return this.model;

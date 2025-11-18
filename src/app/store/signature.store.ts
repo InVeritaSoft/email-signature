@@ -1,4 +1,10 @@
-import { computed, effect } from '@angular/core';
+import {
+  computed,
+  effect,
+  inject,
+  Injector,
+  runInInjectionContext,
+} from '@angular/core';
 import {
   signalStore,
   withState,
@@ -8,6 +14,10 @@ import {
   patchState,
 } from '@ngrx/signals';
 import { GRADIENTS } from '../constants/colors';
+import {
+  LocalStorageService,
+  PersonalData,
+} from '../services/local-storage.service';
 
 export enum SignatureVariant {
   Classic = 'classic',
@@ -85,17 +95,19 @@ const getRandomTitle = (): string => {
   return randomTitles[Math.floor(Math.random() * randomTitles.length)];
 };
 
-const initialState: SignatureState = {
+const initialState: Omit<
+  SignatureState,
+  | 'websiteUrl'
+  | 'websiteText'
+  | 'facebookUrl'
+  | 'youtubeUrl'
+  | 'linkedInSocialUrl'
+> = {
   name: 'John Doe',
   title: getRandomTitle(),
   linkedInText: 'John on LinkedIn',
   linkedInUrl: 'https://www.linkedin.com/in/john-doe',
-  websiteUrl: 'https://inveritasoft.com',
-  websiteText: 'inveritasoft.com',
-  facebookUrl: 'https://www.facebook.com/inveritasoft',
-  youtubeUrl: 'https://www.youtube.com/@inveritasoft',
-  linkedInSocialUrl: 'https://www.linkedin.com/company/inveritasoft',
-  imageUrl: 'https://i.pravatar.cc/180?img=' + Math.floor(Math.random() * 70),
+  imageUrl: 'assets/photo-placeholder.jpg',
   baseUrl: '',
   variant: SignatureVariant.Classic,
 };
@@ -295,55 +307,140 @@ const saveToStorage = async (state: SignatureState): Promise<void> => {
 
 export const SignatureStore = signalStore(
   { providedIn: 'root' },
-  withState(initialState),
+  withState(initialState as SignatureState),
   withHooks({
     onInit: async (store) => {
+      // Capture injector before any async operations to maintain injection context
+      const injector = inject(Injector);
+
       // Pre-load social icons to base64 cache
       await preloadSocialIcons();
 
-      // Load state from Chrome Storage on initialization
+      // Initialize local storage service
+      const localStorageService = new LocalStorageService();
+
+      // Load personal data from local storage first (takes priority)
+      const personalData = localStorageService.loadPersonalData();
+      const hadExistingData = !!personalData;
+      if (personalData) {
+        patchState(store, {
+          name: personalData.name || store.name(),
+          title: personalData.title || store.title(),
+          linkedInUrl: personalData.linkedInUrl || store.linkedInUrl(),
+          imageUrl: personalData.imageUrl || store.imageUrl(),
+        });
+      }
+
+      // Load state from Chrome Storage on initialization (for other fields)
       const savedState = await loadFromStorage();
       let isInitializing = true;
 
       if (savedState) {
         // Remove hardcoded social links and website from saved state to prevent overriding them
+        // Also skip personal data fields as they come from local storage
         const {
           facebookUrl,
           youtubeUrl,
           linkedInSocialUrl,
           websiteUrl,
           websiteText,
+          name,
+          title,
+          linkedInUrl,
+          imageUrl,
           ...stateToLoad
         } = savedState;
         patchState(store, stateToLoad);
       }
 
-      // Mark initialization as complete
+      // Watch for personal data changes and save to local storage
+      // Use a flag to prevent saving during initial load
+      let hasInitialized = false;
+      let initialValues: PersonalData | null = null;
+
+      // Save initial values to local storage if it was empty
+      if (!hadExistingData) {
+        const initialPersonalData: PersonalData = {
+          name: store.name(),
+          title: store.title(),
+          linkedInUrl: store.linkedInUrl(),
+          imageUrl: store.imageUrl(),
+        };
+        localStorageService.savePersonalData(initialPersonalData);
+        initialValues = initialPersonalData;
+        hasInitialized = true;
+      }
+
+      // Use runInInjectionContext to run effect within proper injection context
+      runInInjectionContext(injector, () => {
+        effect(() => {
+          // Track all personal data signals to ensure reactivity
+          const name = store.name();
+          const title = store.title();
+          const linkedInUrl = store.linkedInUrl();
+          const imageUrl = store.imageUrl();
+
+          const personalData: PersonalData = {
+            name,
+            title,
+            linkedInUrl,
+            imageUrl,
+          };
+
+          // On first run, store initial values (if not already set)
+          if (!hasInitialized) {
+            hasInitialized = true;
+            initialValues = personalData;
+            return;
+          }
+
+          // Only save if values have actually changed
+          if (
+            initialValues &&
+            initialValues.name === personalData.name &&
+            initialValues.title === personalData.title &&
+            initialValues.linkedInUrl === personalData.linkedInUrl &&
+            initialValues.imageUrl === personalData.imageUrl
+          ) {
+            return;
+          }
+
+          // Update initial values for next comparison
+          initialValues = personalData;
+
+          // Save to local storage
+          localStorageService.savePersonalData(personalData);
+        });
+      });
+
+      // Mark initialization as complete after effects are set up
       isInitializing = false;
 
       // Watch for state changes and save to Chrome Storage
       // Only save after initialization is complete to avoid saving during load
-      effect(() => {
-        // Skip saving during initialization
-        if (isInitializing) {
-          return;
-        }
+      runInInjectionContext(injector, () => {
+        effect(() => {
+          // Skip saving during initialization
+          if (isInitializing) {
+            return;
+          }
 
-        const currentState = {
-          name: store.name(),
-          title: store.title(),
-          linkedInUrl: store.linkedInUrl(),
-          linkedInText: store.linkedInText(),
-          websiteUrl: INVERITA_WEBSITE_URL,
-          websiteText: INVERITA_WEBSITE_TEXT,
-          facebookUrl: INVERITA_FACEBOOK_URL,
-          youtubeUrl: INVERITA_YOUTUBE_URL,
-          linkedInSocialUrl: INVERITA_LINKEDIN_SOCIAL_URL,
-          imageUrl: store.imageUrl(),
-          baseUrl: store.baseUrl(),
-          variant: store.variant(),
-        };
-        saveToStorage(currentState);
+          const currentState = {
+            name: store.name(),
+            title: store.title(),
+            linkedInUrl: store.linkedInUrl(),
+            linkedInText: store.linkedInText(),
+            websiteUrl: INVERITA_WEBSITE_URL,
+            websiteText: INVERITA_WEBSITE_TEXT,
+            facebookUrl: INVERITA_FACEBOOK_URL,
+            youtubeUrl: INVERITA_YOUTUBE_URL,
+            linkedInSocialUrl: INVERITA_LINKEDIN_SOCIAL_URL,
+            imageUrl: store.imageUrl(),
+            baseUrl: store.baseUrl(),
+            variant: store.variant(),
+          };
+          saveToStorage(currentState);
+        });
       });
     },
   }),
@@ -544,6 +641,21 @@ export const SignatureStore = signalStore(
 
       updateVariant(variant: SignatureVariant): void {
         patchState(store, { variant });
+      },
+
+      /**
+       * Clears personal data from local storage cache
+       */
+      clearPersonalDataCache(): void {
+        const localStorageService = new LocalStorageService();
+        localStorageService.clearPersonalData();
+        // Reset to initial values
+        patchState(store, {
+          name: initialState.name,
+          title: initialState.title,
+          linkedInUrl: initialState.linkedInUrl,
+          imageUrl: initialState.imageUrl,
+        });
       },
 
       updateState(updates: Partial<SignatureState>): void {

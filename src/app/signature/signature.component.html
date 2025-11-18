@@ -293,6 +293,7 @@
               class="form-control"
               placeholder="https://example.com/image.jpg or paste base64 data URL"
               (input)="syncFormToStore($event)"
+              (blur)="onImageUrlBlur($event)"
               [class.invalid]="
                 signatureForm.get('imageUrl')?.invalid &&
                 (signatureForm.get('imageUrl')?.touched || formSubmitted())
@@ -358,6 +359,17 @@
         <div *ngIf="emailPreviewCopySuccess()" class="email-copy-success">
           ✓ Copied!
         </div>
+      </div>
+
+      <div class="cache-actions">
+        <button
+          type="button"
+          (click)="clearCache()"
+          class="clear-cache-button"
+          title="Clear cached personal data (name, title, LinkedIn URL, and photo)"
+        >
+          🗑️ Clear Cache
+        </button>
       </div>
     </form>
   </div>
