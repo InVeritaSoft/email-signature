@@ -41,13 +41,14 @@ export class SignatureComponent implements OnInit {
   readonly emailHtmlWithBase64 = signal<SafeHtml | null>(null);
   readonly formSubmitted = signal(false);
   readonly imageProcessing = signal(false);
+  readonly pendingVariant = signal<SignatureVariant | null>(null);
   private lastSignatureHash = signal<string>('');
   private isConverting = false;
 
   constructor() {
     // URL validator that allows empty strings, valid URLs (http/https or relative paths), or base64 data URLs
     const urlValidator = Validators.pattern(
-      /^(https?:\/\/.+|\/.*|assets\/.*|data:image\/.+;base64,.+|$)/
+      /^(https?:\/\/.+|\/.*|assets\/.*|data:image\/.+;base64,.+|$)/,
     );
 
     // Initialize form with store values
@@ -121,7 +122,7 @@ export class SignatureComponent implements OnInit {
           if (this.signatureForm.get('linkedInText')) {
             this.signatureForm.patchValue(
               { linkedInText: autoLinkedInText },
-              { emitEvent: false }
+              { emitEvent: false },
             );
           }
         }
@@ -167,7 +168,7 @@ export class SignatureComponent implements OnInit {
               .convertImagesToBase64(signature)
               .then((htmlWithBase64) => {
                 this.emailHtmlWithBase64.set(
-                  this.sanitizer.bypassSecurityTrustHtml(htmlWithBase64)
+                  this.sanitizer.bypassSecurityTrustHtml(htmlWithBase64),
                 );
                 this.isConverting = false;
               })
@@ -175,7 +176,7 @@ export class SignatureComponent implements OnInit {
                 console.error('Failed to convert images to base64:', error);
                 // Fallback to original signature
                 this.emailHtmlWithBase64.set(
-                  this.sanitizer.bypassSecurityTrustHtml(signature)
+                  this.sanitizer.bypassSecurityTrustHtml(signature),
                 );
                 this.isConverting = false;
               });
@@ -448,11 +449,22 @@ export class SignatureComponent implements OnInit {
   }
 
   /**
-   * Updates the selected variant
+   * Sets the variant as pending; it is applied only after Activate Card on Review and Confirm.
    */
   selectVariant(variant: SignatureVariant): void {
-    this.store.updateVariant(variant);
-    this.signatureForm.patchValue({ variant }, { emitEvent: false });
+    this.pendingVariant.set(variant);
+  }
+
+  /**
+   * Applies the pending variant (activates the card). Call from Review and Confirm step.
+   */
+  activateCard(): void {
+    const pending = this.pendingVariant();
+    if (pending != null) {
+      this.store.updateVariant(pending);
+      this.signatureForm.patchValue({ variant: pending }, { emitEvent: false });
+      this.pendingVariant.set(null);
+    }
   }
 
   /**
@@ -467,15 +479,14 @@ export class SignatureComponent implements OnInit {
     SignatureVariant.HorizontalLogo,
     SignatureVariant.HorizontalSimple,
     SignatureVariant.VerticalSimple,
-  ].filter(variant => variant !== SignatureVariant.GradientBlue);
+  ].filter((variant) => variant !== SignatureVariant.GradientBlue);
 
   /**
    * Get visible variants (only Classic is shown)
    */
   readonly visibleVariants = computed(() => {
     return this.variants.filter(
-      (variant) =>
-        variant === SignatureVariant.Classic
+      (variant) => variant === SignatureVariant.Classic,
     );
   });
 
@@ -512,12 +523,12 @@ export class SignatureComponent implements OnInit {
     try {
       // Show processing indicator
       this.imageProcessing.set(true);
-      
+
       // Process image: resize and center face
       const base64 = await this.imageProcessor.processImage(
         file,
         800, // max dimension before processing
-        400  // target size for final output (square)
+        400, // target size for final output (square)
       );
 
       // Update form and store with processed base64 data URL
@@ -529,7 +540,10 @@ export class SignatureComponent implements OnInit {
       // Fallback to original file conversion if processing fails
       try {
         const base64 = await this.fileToBase64(file);
-        this.signatureForm.patchValue({ imageUrl: base64 }, { emitEvent: false });
+        this.signatureForm.patchValue(
+          { imageUrl: base64 },
+          { emitEvent: false },
+        );
         this.store.updateImageUrl(base64);
         this.imageProcessing.set(false);
       } catch (fallbackError) {
@@ -629,7 +643,7 @@ export class SignatureComponent implements OnInit {
     this.store.updateImageUrl('');
     // Reset file input if it exists
     const fileInput = document.getElementById(
-      'imageUpload'
+      'imageUpload',
     ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -640,19 +654,26 @@ export class SignatureComponent implements OnInit {
    * Clears personal data cache and resets to default values
    */
   clearCache(): void {
-    if (confirm('Are you sure you want to clear all cached personal data? This will reset your name, title, LinkedIn URL, and photo.')) {
+    if (
+      confirm(
+        'Are you sure you want to clear all cached personal data? This will reset your name, title, LinkedIn URL, and photo.',
+      )
+    ) {
       this.store.clearPersonalDataCache();
       // Update form to reflect reset values
       const state = this.store.state();
-      this.signatureForm.patchValue({
-        name: state.name,
-        title: state.title,
-        linkedInUrl: state.linkedInUrl,
-        imageUrl: state.imageUrl,
-      }, { emitEvent: false });
+      this.signatureForm.patchValue(
+        {
+          name: state.name,
+          title: state.title,
+          linkedInUrl: state.linkedInUrl,
+          imageUrl: state.imageUrl,
+        },
+        { emitEvent: false },
+      );
       // Reset file input if it exists
       const fileInput = document.getElementById(
-        'imageUpload'
+        'imageUpload',
       ) as HTMLInputElement;
       if (fileInput) {
         fileInput.value = '';

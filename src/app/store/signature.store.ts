@@ -1083,7 +1083,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #fbfbfb; padding: 0; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #fbfbfb; padding: 0; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td>
       <!-- Content Table -->
@@ -1220,7 +1220,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #231F20; padding: 0; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #231F20; padding: 0; margin: 0 auto; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td>
       <!-- Content Table -->
@@ -1353,7 +1353,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: ${GRADIENTS.default}; padding: 0; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: ${GRADIENTS.default}; padding: 0; margin: 0 auto; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td style="padding: 0; background: ${GRADIENTS.default};">
       <!-- Content Table with spacer cells for inner gaps only -->
@@ -1504,7 +1504,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: linear-gradient(to bottom, #0072DA, #64CCC9); padding: 20px; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: linear-gradient(to bottom, #0072DA, #64CCC9); padding: 20px; margin: 0 auto; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td>
       <!-- Logo -->
@@ -1597,7 +1597,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #231F20; padding: 0; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background-color: #231F20; padding: 0; margin: 0 auto; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td style="padding: 0; background-color: #231F20;">
       <!-- Content Table with spacer cells for inner gaps only -->
@@ -1748,7 +1748,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: linear-gradient(to right, #0072DA, #64CCC9); padding: 0; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="background: linear-gradient(to right, #0072DA, #64CCC9); padding: 0; margin: 0 auto; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td>
       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(to right, #0072DA, #64CCC9);">
@@ -1840,7 +1840,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="padding: 0; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="padding: 0; border: 0; min-width: 600px; max-width: 600px; width: 600px; table-layout: fixed;">
   <tr>
     <td style="padding: 0">
       <!-- Content Table with spacer cells for inner gaps only -->
@@ -2007,7 +2007,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="400" style="background-color: #ffffff; padding: 0; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="400" style="background-color: #ffffff; padding: 0; margin: 0 auto; border: 0; min-width: 400px; max-width: 400px; width: 400px; table-layout: fixed;">
   <tr>
     <td>
       <table role="presentation" cellspacing="10" cellpadding="0" border="0" width="100%" style="background-color: #ffffff;">
@@ -2069,7 +2069,7 @@ export const SignatureStore = signalStore(
         const linkedInSocialUrl = state.linkedInSocialUrl || '';
 
         return `<!-- Main Container Table -->
-<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="400" style="background-color: #ffffff; padding: 20px; margin: 0 auto; border: 0;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="400" style="background-color: #ffffff; padding: 20px; margin: 0 auto; border: 0; min-width: 400px; max-width: 400px; width: 400px; table-layout: fixed;">
   <tr>
     <td>
       <!-- Logo -->
