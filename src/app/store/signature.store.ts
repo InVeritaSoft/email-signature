@@ -128,6 +128,38 @@ const LINKEDIN_ICON_PATH_B = 'assets/linkedin-fill-b.png';
 // Cache for pre-converted base64 social icons
 const socialIconBase64Cache = new Map<string, string>();
 
+/**
+ * Absolute URL for fetch() of app assets. Uses document.baseURI so paths respect
+ * Angular baseHref (e.g. /email-signature/). Origin-only URLs miss the base path and 404.
+ */
+function resolveAssetFetchUrl(assetPath: string): string {
+  if (
+    assetPath.startsWith('http://') ||
+    assetPath.startsWith('https://') ||
+    assetPath.startsWith('data:')
+  ) {
+    return assetPath;
+  }
+  if (
+    typeof chrome !== 'undefined' &&
+    chrome.runtime &&
+    chrome.runtime.getURL
+  ) {
+    const basePath = assetPath.startsWith('/')
+      ? assetPath.substring(1)
+      : assetPath;
+    return chrome.runtime.getURL(basePath);
+  }
+  if (typeof document !== 'undefined' && document.baseURI) {
+    return new URL(assetPath.replace(/^\//, ''), document.baseURI).href;
+  }
+  if (typeof window !== 'undefined') {
+    const basePath = assetPath.startsWith('/') ? assetPath : `/${assetPath}`;
+    return `${window.location.origin}${basePath}`;
+  }
+  return assetPath;
+}
+
 // Helper to load PNG image and convert to base64 data URL
 const loadPngToBase64 = async (imagePath: string): Promise<string> => {
   // Check cache first
@@ -136,21 +168,7 @@ const loadPngToBase64 = async (imagePath: string): Promise<string> => {
   }
 
   try {
-    // Determine the full URL based on context (Chrome extension vs web)
-    let fullUrl: string;
-    if (
-      typeof chrome !== 'undefined' &&
-      chrome.runtime &&
-      chrome.runtime.getURL
-    ) {
-      // Chrome extension context
-      fullUrl = chrome.runtime.getURL(imagePath);
-    } else {
-      // Web context - use relative path or construct from window.location
-      fullUrl = imagePath.startsWith('http')
-        ? imagePath
-        : `${window.location.origin}/${imagePath}`;
-    }
+    const fullUrl = resolveAssetFetchUrl(imagePath);
 
     // Fetch the image
     const response = await fetch(fullUrl);
@@ -502,46 +520,10 @@ export const SignatureStore = signalStore(
       }
 
       try {
-        // Resolve relative paths (assets/*) to absolute URLs
-        let resolvedPath = imagePath;
-        if (
-          imagePath.startsWith('assets/') ||
-          imagePath.startsWith('/assets/')
-        ) {
-          // Check if we're in a Chrome Extension context
-          if (isChromeExtension() && chrome.runtime && chrome.runtime.getURL) {
-            // Use chrome.runtime.getURL for extension resources
-            const basePath = imagePath.startsWith('/')
-              ? imagePath.substring(1)
-              : imagePath;
-            resolvedPath = chrome.runtime.getURL(basePath);
-          } else {
-            // For web context, resolve to current origin
-            const basePath = imagePath.startsWith('/')
-              ? imagePath
-              : `/${imagePath}`;
-            resolvedPath = `${window.location.origin}${basePath}`;
-          }
-        } else if (
-          !imagePath.startsWith('http://') &&
-          !imagePath.startsWith('https://') &&
-          !imagePath.startsWith('data:')
-        ) {
-          // For other relative paths
-          if (isChromeExtension() && chrome.runtime && chrome.runtime.getURL) {
-            // Use chrome.runtime.getURL for extension resources
-            const basePath = imagePath.startsWith('/')
-              ? imagePath.substring(1)
-              : imagePath;
-            resolvedPath = chrome.runtime.getURL(basePath);
-          } else {
-            // For web context, resolve to current origin
-            const basePath = imagePath.startsWith('/')
-              ? imagePath
-              : `/${imagePath}`;
-            resolvedPath = `${window.location.origin}${basePath}`;
-          }
-        }
+        const resolvedPath =
+          imagePath.startsWith('http://') || imagePath.startsWith('https://')
+            ? imagePath
+            : resolveAssetFetchUrl(imagePath);
 
         // Fetch the image
         const response = await fetch(resolvedPath);
