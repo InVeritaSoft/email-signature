@@ -538,6 +538,45 @@ export class SignatureComponent implements OnInit {
   }
 
   /**
+   * Safari (especially iOS) often leaves `file.type` empty or uses
+   * `application/octet-stream` for camera / Photos picks — validate with magic bytes.
+   */
+  private async sniffJpegOrPngMagicBytes(file: File): Promise<boolean> {
+    if (file.size < 4) {
+      return false;
+    }
+    const buf = await file.slice(0, 4).arrayBuffer();
+    const b = new Uint8Array(buf);
+    const isJpeg = b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+    const isPng =
+      b[0] === 0x89 &&
+      b[1] === 0x50 &&
+      b[2] === 0x4e &&
+      b[3] === 0x47;
+    return isJpeg || isPng;
+  }
+
+  private async isAllowedPortraitUpload(file: File): Promise<boolean> {
+    const allowedTypes = new Set([
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/pjpeg',
+      'image/x-png',
+    ]);
+    if (allowedTypes.has(file.type)) {
+      return true;
+    }
+    if (/\.(jpe?g|png)$/i.test(file.name || '')) {
+      return true;
+    }
+    if (!file.type || file.type === 'application/octet-stream') {
+      return this.sniffJpegOrPngMagicBytes(file);
+    }
+    return false;
+  }
+
+  /**
    * Handles image file upload, processes (resizes and centers face), and converts to base64
    */
   async onImageUpload(event: Event): Promise<void> {
@@ -548,9 +587,7 @@ export class SignatureComponent implements OnInit {
       return;
     }
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
+    if (!(await this.isAllowedPortraitUpload(file))) {
       alert('Please upload a valid image file (JPG, JPEG, or PNG)');
       input.value = ''; // Reset input
       return;

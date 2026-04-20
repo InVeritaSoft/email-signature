@@ -159,6 +159,16 @@ export class ImageProcessorService {
           const img = new Image();
           img.onload = async () => {
             try {
+              if ('decode' in img && typeof img.decode === 'function') {
+                try {
+                  await img.decode();
+                } catch (decodeErr) {
+                  console.warn(
+                    'Image decode() failed, continuing with onload state:',
+                    decodeErr,
+                  );
+                }
+              }
               // Step 1: Resize if image is too large
               const { width, height } = this.calculateResizeDimensions(
                 img.width,
